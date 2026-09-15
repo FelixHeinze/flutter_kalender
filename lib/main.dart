@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
-
+//vorüberlegung:
+/* 
+  -Kalender muss gebaut werden, der die Tage und Monate anzeigt.
+  -übernahme der funktionen aus der alten version in js
+  -erste version als liste/col/row bauen die den monat anzeigt 
+  -zweite version nutzt vorgefertigten Kalender widget
+  - navigationsbar für verschiedene seiten ( historische ereignisse, kalender, etc.)
+  - 
+  
+ */
 void main() {
   runApp(const MyApp());
 }
@@ -7,7 +16,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
