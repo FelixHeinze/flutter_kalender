@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_kalender/pages/history.dart';
+//import 'package:table_calendar/table_calendar.dart'; --> vorgefertigtes kalender widget
 //vorüberlegung:
 /* 
   -Kalender muss gebaut werden, der die Tage und Monate anzeigt.
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-     home: Scaffold(),
+     home: historyPage(),
     );
   }
 }

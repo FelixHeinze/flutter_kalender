@@ -1,12 +1,3 @@
-
-/* Model klasse für API von wikipedia bzgl der historischen ereignisse
-app.quicktype.io --> json eingefügt und in dart konvertiert
-https://de.wikipedia.org/api/rest_v1/feed/onthisday/events/X/Y
-wobei X = Monat und Y = Tag
-
-
-
- */
 // To parse this JSON data, do
 //
 //     final wikiModel = wikiModelFromJson(jsonString);
@@ -18,7 +9,7 @@ WikiModel wikiModelFromJson(String str) => WikiModel.fromJson(json.decode(str));
 String wikiModelToJson(WikiModel data) => json.encode(data.toJson());
 
 class WikiModel {
-    final List<Event> events;
+    List<Event> events;
 
     WikiModel({
         required this.events,
@@ -34,9 +25,9 @@ class WikiModel {
 }
 
 class Event {
-    final String text;
-    final List<Page> pages;
-    final int year;
+    String text;
+    List<Page> pages;
+    int year;
 
     Event({
         required this.text,
@@ -58,27 +49,27 @@ class Event {
 }
 
 class Page {
-    final Type type;
-    final String title;
-    final String displaytitle;
-    final Namespace namespace;
-    final String wikibaseItem;
-    final Titles titles;
-    final int pageid;
-    final Originalimage? thumbnail;
-    final Originalimage? originalimage;
-    final Lang lang;
-    final Dir dir;
-    final String revision;
-    final String tid;
-    final DateTime timestamp;
-    final String? description;
-    final DescriptionSource? descriptionSource;
-    final ContentUrls contentUrls;
-    final String extract;
-    final String extractHtml;
-    final String normalizedtitle;
-    final Coordinates? coordinates;
+    Type type;
+    String title;
+    String displaytitle;
+    Namespace namespace;
+    String wikibaseItem;
+    Titles titles;
+    int pageid;
+    Originalimage? thumbnail;
+    Originalimage? originalimage;
+    Lang lang;
+    Dir dir;
+    String revision;
+    String tid;
+    DateTime timestamp;
+    String? description;
+    DescriptionSource? descriptionSource;
+    ContentUrls contentUrls;
+    String extract;
+    String extractHtml;
+    String normalizedtitle;
+    Coordinates? coordinates;
 
     Page({
         required this.type,
@@ -154,8 +145,8 @@ class Page {
 }
 
 class ContentUrls {
-    final Desktop desktop;
-    final Desktop mobile;
+    Desktop desktop;
+    Desktop mobile;
 
     ContentUrls({
         required this.desktop,
@@ -174,10 +165,10 @@ class ContentUrls {
 }
 
 class Desktop {
-    final String page;
-    final String revisions;
-    final String edit;
-    final String talk;
+    String page;
+    String revisions;
+    String edit;
+    String talk;
 
     Desktop({
         required this.page,
@@ -202,8 +193,8 @@ class Desktop {
 }
 
 class Coordinates {
-    final double lat;
-    final double lon;
+    double lat;
+    double lon;
 
     Coordinates({
         required this.lat,
@@ -246,8 +237,8 @@ final langValues = EnumValues({
 });
 
 class Namespace {
-    final int id;
-    final String text;
+    int id;
+    String text;
 
     Namespace({
         required this.id,
@@ -266,9 +257,9 @@ class Namespace {
 }
 
 class Originalimage {
-    final String source;
-    final int width;
-    final int height;
+    String source;
+    int width;
+    int height;
 
     Originalimage({
         required this.source,
@@ -290,9 +281,9 @@ class Originalimage {
 }
 
 class Titles {
-    final String canonical;
-    final String normalized;
-    final String display;
+    String canonical;
+    String normalized;
+    String display;
 
     Titles({
         required this.canonical,
