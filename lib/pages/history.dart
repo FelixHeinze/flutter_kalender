@@ -14,11 +14,11 @@ class historyPage extends StatefulWidget {
 }
 
 class _historyPageState extends State<historyPage> {
-  List<WikiModel> historyModel = [];
+  late WikiModel historyModel;
    getHistory(){
     GetServices().getServices().then((value) {
       setState(() {
-        historyModel = value! as List<WikiModel>;
+        historyModel != WikiModel;
       });
     });
   }
@@ -36,14 +36,14 @@ class _historyPageState extends State<historyPage> {
       title: const Text('Historische Ereignisse'),),
       body: ListView.builder(
         shrinkWrap: true,
-        itemCount: historyModel.length,
+        itemCount: historyModel.events.length,
         itemBuilder: (context, index) {
-          final data = historyModel[index].events.
+          final data = historyModel.events[index];
           return Material(
             child: Row(
               children:[ 
               Text(data.toString()),
-              Text(historyModel.length.toString()),
+              Text(historyModel.events.toString()),
               Text("test"),
             ]
             ),
