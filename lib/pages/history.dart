@@ -38,7 +38,7 @@ class _historyPageState extends State<historyPage> {
         shrinkWrap: true,
         itemCount: historyModel.length,
         itemBuilder: (context, index) {
-          final data = historyModel[index].events.toString();
+          final data = historyModel[index].events.
           return Material(
             child: Row(
               children:[ 
