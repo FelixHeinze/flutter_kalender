@@ -14,44 +14,48 @@ class historyPage extends StatefulWidget {
 }
 
 class _historyPageState extends State<historyPage> {
-  late WikiModel historyModel;
-   getHistory(){
-    GetServices().getServices().then((value) {
-      setState(() {
-        historyModel != WikiModel;
-      });
+  WikiModel? historyModel;
+
+  Future<void> getHistory() async {
+    final value = await GetServices().getServices();
+    if (!mounted) return;
+
+    setState(() {
+      historyModel = value ?? WikiModel(events: const []);
     });
   }
+
   @override
   void initState() {
-    getHistory();
     super.initState();
-    }
+    getHistory();
+  }
 
   @override
+  Widget build(BuildContext context) {
+    final events = historyModel?.events ?? const [];
 
- Widget build(BuildContext context) {
- return Scaffold(
-    appBar: AppBar(
-      title: const Text('Historische Ereignisse'),),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Historische Ereignisse'),
+      ),
       body: ListView.builder(
         shrinkWrap: true,
-        itemCount: historyModel.events.length,
+        itemCount: events.length,
         itemBuilder: (context, index) {
-          final data = historyModel.events[index];
+          final data = events[index];
           return Material(
-            child: Row(
-              children:[ 
-              Text(data.toString()),
-              Text(historyModel.events.toString()),
-              Text("test"),
-            ]
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Text(data.text.toString())
+                ],
+              ),
             ),
-            
           );
         },
       ),
-    )
-;
-
-}}
+    );
+  }
+}
