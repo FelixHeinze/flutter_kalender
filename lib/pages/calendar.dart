@@ -1,66 +1,143 @@
-/*
-//funktion um die Tabelle zu erstellen
-    function createCalendar() {
-        const table = document.getElementById("kalenderDynamisch");
-        const year = _objectDatum.getFullYear();
-        const month = _objectDatum.getMonth();
-
-        // Lösche bestehende Zeilen (außer der Header)
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
-
-        // Erstelle neue Zeilen für den Kalender
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay();
-/*         sonntag = 0, montag = 1, dienstag = 2, mittwoch = 3, donnerstag = 4, freitag = 5, samstag = 6
-        montag soll 0 werden, also muss 1 abgezogen werden, wenn der Wert 0 ist, soll er 6 sein --> bswp sonntag=0 +6 %7 = 6
-         montag=1 +6 %7 =0 ...  */
-        const adjustedStartingDayOfWeek = (startingDayOfWeek + 6) % 7;
-
-        let currentRow = table.insertRow();
-        let currentCell;
-
-        // Füge leere Zellen für die Tage vor dem ersten Tag hinzu
-        for (let i = 0; i < adjustedStartingDayOfWeek; i++) {
-            currentCell = currentRow.insertCell();
-            currentCell.innerHTML = "";
-        }
-
-        // Füge die Tage des Monats hinzu
-        for (let day = 1; day <= daysInMonth; day++) {
-            if (currentRow.cells.length === 7) {
-                currentRow = table.insertRow();
-            }
-            currentCell = currentRow.insertCell();
-            currentCell.innerHTML = day;
-            if (day === _objectDatum.getDate()) {
-                currentCell.style.backgroundColor = "yellow"; // markiere den aktuellen tag, kann auch als klasse in css ausgelagert werden, später
-            }
-            // Feiertage markieren
-            const currentDate = new Date(year, month, day);
-            const isHoliday = feiertage.some(datumFeiertag => datumFeiertag.getTime() === currentDate.getTime());
-            if (isHoliday) {
-                currentCell.style.backgroundColor = "red"; // markiere feiertage wird in css ausgelagert später
-            }
-        }
-        // leere Zellen für die tage nach dem letzten tag hinzufügen
-        while (currentRow.cells.length < 7) {
-            currentCell = currentRow.insertCell();
-            currentCell.innerHTML = "";
-        }
-    }
-
-*/
-//orientierung an javascript funktion um kalender zu schreiben
-
 import 'package:flutter/material.dart';
 
+class Calendar extends StatefulWidget {
+  final DateTime initialDate;
+  final void Function(DateTime) onDaySelected;
 
+  const Calendar({
+    super.key,
+    required this.initialDate,
+    required this.onDaySelected,
+  });
 
-class Calendar extends StatelessWidget {
+  @override
+  State<Calendar> createState() => _CalendarState();
+}
+
+class _CalendarState extends State<Calendar> {
+  late DateTime _displayedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayedMonth = DateTime(
+      widget.initialDate.year,
+      widget.initialDate.month,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant Calendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.initialDate.year != widget.initialDate.year ||
+        oldWidget.initialDate.month != widget.initialDate.month) {
+      _displayedMonth = DateTime(
+        widget.initialDate.year,
+        widget.initialDate.month,
+      );
+    }
+  }
+
+  void _changeMonth(int amount) {
+    setState(() {
+      _displayedMonth = DateTime(
+        _displayedMonth.year,
+        _displayedMonth.month + amount,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final horizontalPadding = constraints.maxWidth < 500 ? 12.0 : 24.0;
+        final calendarWidth =
+            (constraints.maxWidth - horizontalPadding * 2).clamp(0.0, 700.0);
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 16,
+          ),
+          child: Center(
+            child: SizedBox(
+              width: calendarWidth,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        tooltip: 'Vorheriger Monat',
+                        onPressed: () => _changeMonth(-1),
+                        icon: const Icon(Icons.chevron_left),
+                      ),
+                      Flexible(
+                        child: Text(
+                          '${_monthName(_displayedMonth.month)} '
+                          '${_displayedMonth.year}',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Nächster Monat',
+                        onPressed: () => _changeMonth(1),
+                        icon: const Icon(Icons.chevron_right),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  CalendarGrid(
+                    year: _displayedMonth.year,
+                    month: _displayedMonth.month,
+                    width: calendarWidth,
+                    selectedDay: widget.initialDate,
+                    onDaySelected: widget.onDaySelected,
+                  ),
+                  const SizedBox(height: 20),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.event),
+                      title: const Text('Ausgewählter Tag'),
+                      subtitle: Text(_formatDate(widget.initialDate)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ];
+    return months[month - 1];
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}. ${_monthName(date.month)} ${date.year}';
+  }
+}
+
+class CalendarGrid extends StatelessWidget {
   final int year;
   final int month;
   final double width;
@@ -69,7 +146,7 @@ class Calendar extends StatelessWidget {
   final void Function(DateTime)? onDaySelected;
   final DateTime? selectedDay;
 
-  const Calendar({
+  const CalendarGrid({
     super.key,
     required this.year,
     required this.month,
@@ -78,61 +155,120 @@ class Calendar extends StatelessWidget {
     this.dayColors,
     this.onDaySelected,
     this.selectedDay,
-  }) : assert(month >= 1 && month <= 12, 'Monat muss zwische 1-12 sein');
+  });
 
   @override
   Widget build(BuildContext context) {
-    final int daysInMonth = DateTime(year, month + 1, 0).day;
+    final daysInMonth = DateTime(year, month + 1, 0).day;
     final firstDayOfMonth = DateTime(year, month, 1);
-    final int startingWeekday = (firstDayOfMonth.weekday % 7) + 1;
 
+    // DateTime.weekday: Montag = 1 ... Sonntag = 7.
+    final emptyDaysAtStart = firstDayOfMonth.weekday - 1;
 
+    final daysToDisplay = <int?>[
+      ...List<int?>.filled(emptyDaysAtStart, null),
+      ...List<int>.generate(daysInMonth, (index) => index + 1),
+    ];
 
-    final List<int?> daysToDisplay = _generateDayList(
-      startingWeekday,
-      daysInMonth,
-    );
-    final double cellSize = width / 7;
+    // Immer genau 6 Wochen anzeigen. Dadurch bleibt die Höhe
+    // des Kalenders stabil und es entsteht kein Layout-Overflow.
+    while (daysToDisplay.length < 42) {
+      daysToDisplay.add(null);
+    }
 
-    return SizedBox(
-      width: width,
-      child: Column(
-        children: [
-          _WeekdayHeader(cellSize: cellSize),
-          const SizedBox(height: 4),
-          _CalendarGrid(
-            year: year,
-            month: month,
-            days: daysToDisplay,
-            cellSize: cellSize,
-            onDaySelected: onDaySelected,
-            selectedDay: selectedDay,
+    final cellSize = width / 7;
+
+    return Column(
+      children: [
+        _WeekdayHeader(cellSize: cellSize),
+        const SizedBox(height: 6),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
           ),
-        ],
-      ),
-    );
-  }
+          itemCount: daysToDisplay.length,
+          itemBuilder: (context, index) {
+            final day = daysToDisplay[index];
 
-  List<int?> _generateDayList(int startingWeekday, int daysInMonth) {
-    final List<int?> days = [];
-    final int emptyDaysAtStart = startingWeekday - 1;
-    for (int i = 0; i < emptyDaysAtStart; i++) {
-      days.add(null);
-    }
-    for (int i = 1; i <= daysInMonth; i++) {
-      days.add(i);
-    }
-    return days;
+            if (day == null) {
+              return const SizedBox.shrink();
+            }
+
+            final date = DateTime(year, month, day);
+
+            final isSelected = selectedDay != null &&
+                selectedDay!.year == year &&
+                selectedDay!.month == month &&
+                selectedDay!.day == day;
+
+            final today = DateTime.now();
+            final isToday = today.year == year &&
+                today.month == month &&
+                today.day == day;
+
+            final backgroundColor =
+                dayColors?[DateTime(year, month, day)] ??
+                (isToday
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest);
+
+            return InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: onDaySelected == null
+                  ? null
+                  : () => onDaySelected!(date),
+              child: Container(
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.black12,
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 5,
+                      right: 6,
+                      child: Text(
+                        '$day',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (dayContents != null &&
+                        dayContents!.containsKey(date))
+                      Center(child: dayContents![date]),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }
 
 class _WeekdayHeader extends StatelessWidget {
   final double cellSize;
+
   const _WeekdayHeader({required this.cellSize});
 
   @override
   Widget build(BuildContext context) {
-    const weekdays = ['S', 'M', 'D', 'M', 'D', 'F', 'S'];
+    const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+
     return Row(
       children: weekdays.map((day) {
         return SizedBox(
@@ -147,100 +283,6 @@ class _WeekdayHeader extends StatelessWidget {
           ),
         );
       }).toList(),
-    );
-  }
-}
-
-class _CalendarGrid extends StatelessWidget {
-  final int year;
-  final int month;
-  final List<int?> days;
-  final double cellSize;
-  final Map<int, Widget>? dayContents;
-  final Map<int, Color>? dayColors;
-  final void Function(DateTime)? onDaySelected;
-  final DateTime? selectedDay;
-
-  const _CalendarGrid({
-    required this.year,
-    required this.month,
-    required this.days,
-    required this.cellSize,
-    this.dayContents,
-    this.dayColors,
-    this.onDaySelected,
-    this.selectedDay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-      ),
-      itemCount: days.length,
-      itemBuilder: (context, index) {
-        final day = days[index];
-
-        if (day == null) {
-          return const SizedBox.shrink();
-        }
-
-        final Widget? dayContent = (dayContents != null && dayContents!.containsKey(day)) ? dayContents![day] : null;
-        final Color backgroundColor = (dayColors != null && dayColors!.containsKey(day)) ? dayColors![day]! : Colors.grey[200]!;
-
-        final bool isSelected = selectedDay != null &&
-            selectedDay!.year == year &&
-            selectedDay!.month == month &&
-            selectedDay!.day == day;
-
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(4),
-            onTap: () {
-              if (onDaySelected != null) {
-                final clickedDate = DateTime(year, month, day);
-                onDaySelected!(clickedDate);
-              }
-            },
-            child: Container(
-              height: cellSize,
-              width: cellSize,
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(4),
-                border: isSelected
-                    ? Border.all(color: Colors.blueGrey[700]!, width: 2.5)
-                    : Border.all(color: Colors.black12, width: 1),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: Text(
-                      day.toString(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                  if (dayContent != null)
-                    Center(
-                      child: dayContent,
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

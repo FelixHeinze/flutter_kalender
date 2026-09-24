@@ -1,35 +1,133 @@
-
-/*   document.title = "Heute ist der " + tag + "." + monat + "." + jahr;
-    document.getElementById("mainHeadline").innerHTML = "Kalenderblatt vom " + tag + "." + monat + "." + jahr;
-    document.getElementById("datumAusgeschrieben").innerHTML = tag + " " + monatAusgeschrieben + " " + jahr;
-    document.getElementById("wochentag").innerHTML = tagAusgeschrieben;
-    document.getElementById("wieviele").innerHTML = Math.floor((tag - 1) / 7) + 1 + ".";
-    document.getElementById("wochentagAusgeschrieben").innerHTML = tagAusgeschrieben;
-    const monatsnamen = document.getElementsByClassName("monatsname"); //vereinfachung in schleife wenn mehrere elemente mit der gleichen klasse vorhanden sind
-    for (let i = 0; i < monatsnamen.length; i++) {
-        monatsnamen[i].innerHTML = monatAusgeschrieben;
-    }
-    document.getElementById("jahreszahl").innerHTML = jahr;
-    document.getElementById("xTag").innerHTML = (Math.floor((_objectDatum - _objectXtag) / (1000 * 60 * 60 * 24)) + 1);
-    document.getElementById("xJahresende").innerHTML = (Math.round((_objectXjahr - _objectDatum) / (1000 * 60 * 60 * 24)));
-    document.getElementById("monatstage").innerHTML = (new Date(jahr, monat, 0).getDate());
-    // dynamische inhalte für html elemente mit id, die in der index.html datei vorhanden sind, werden hier geschrieben
-    document.getElementById("ereignisseDatum").innerHTML = tag + "." + monat + "." + jahr;
-*/
 import 'package:flutter/material.dart';
 
 class InfoDay extends StatelessWidget {
- const InfoDay({super.key});
+  final DateTime date;
 
- @override
- Widget build(BuildContext context) {
- return const Scaffold(
- body: Center(
- child: Text('Hello World'),
- //vorgabe aus vorheriger aufgabe siehe oben
- //hier wird nur statisch die info zu dem akutellem tag ausgegeben ( der wievielte usw)
- 
- ),
- );
- }
+  const InfoDay({
+    super.key,
+    required this.date,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tag = date.day;
+    final monat = date.month;
+    final jahr = date.year;
+
+    const monatsnamen = [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ];
+
+    const wochentage = [
+      'Montag',
+      'Dienstag',
+      'Mittwoch',
+      'Donnerstag',
+      'Freitag',
+      'Samstag',
+      'Sonntag',
+    ];
+
+    final monatAusgeschrieben = monatsnamen[monat - 1];
+    final tagAusgeschrieben = wochentage[date.weekday - 1];
+    final jahresTag = date.difference(DateTime(jahr, 1, 1)).inDays + 1;
+    final monatstage = DateTime(jahr, monat + 1, 0).day;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Text(
+                        '$tag. $monatAusgeschrieben $jahr',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        tagAusgeschrieben,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _InfoCard(
+                      icon: Icons.event_outlined,
+                      title: 'Tag des Jahres',
+                      value: '$jahresTag.',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _InfoCard(
+                      icon: Icons.calendar_view_month_outlined,
+                      title: 'Tage im Monat',
+                      value: '$monatstage',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+
+  const _InfoCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          children: [
+            Icon(icon, size: 30),
+            const SizedBox(height: 8),
+            Text(title, textAlign: TextAlign.center),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
